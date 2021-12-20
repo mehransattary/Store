@@ -1,5 +1,7 @@
+using DataLayer.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +25,13 @@ namespace Store
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            #region SqlServer
+            services.AddDbContext<ApplicationContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("connection"));
+            });
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,10 +53,13 @@ namespace Store
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(name: "areas",
+                     pattern: "{area:exists}/{controller=Default}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+         
         }
     }
 }
